@@ -48,6 +48,6 @@ fi
 installall
 cd ..
 rm -rf luarocks*
-cd SourceAlex
+cd SaUdiboT
 rm -rf luarocks*
 lua start.lua
